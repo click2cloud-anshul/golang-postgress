@@ -9,8 +9,9 @@ import (
 	"net/http" // used to access the request and response object of the api
 	"strconv"  // package used to covert string into int type
 
-	"github.com/gorilla/mux" // used to get the params from the route
-	_ "github.com/lib/pq"    // postgres golang driver
+	"github.com/gorilla/mux"   // used to get the params from the route
+	"github.com/joho/godotenv" // package used to read the .env file
+	_ "github.com/lib/pq"      // postgres golang driver
 )
 
 // response format
@@ -29,6 +30,12 @@ const (
 
 // create connection with postgres db
 func createConnection() *sql.DB {
+	err := godotenv.Load(".env")
+
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
+
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbname)
@@ -36,7 +43,7 @@ func createConnection() *sql.DB {
 	if err != nil {
 		panic(err)
 	}
-	//defer db.Close()
+
 	err = db.Ping()
 	if err != nil {
 		panic(err)
